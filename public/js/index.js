@@ -9,6 +9,10 @@ socket.on("disconnect", function() {
   console.log("Disconnected from server");
 });
 
+socket.on('welcomeToChat', function(message){
+  console.log('welcomeToChat', message);
+});
+
 socket.on('newMessage', function(message) {
-    console.log('NewMessage:', message);
+    console.log('newMessage:', message);
 });
