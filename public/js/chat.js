@@ -16,6 +16,8 @@ function scroolToBottom() {
   };
 };
 
+
+// Connect user to server
 socket.on("connect", function() {
   let params = jQuery.deparam(window.location.search);
   
@@ -29,25 +31,26 @@ socket.on("connect", function() {
   });
 });
 
-socket.on('updateUserList', function(users) {
-  console.log(users);
-  var ol = jQuery('<ol></ol>');
-  users.forEach(function (user){
-    console.log(user);
-    ol.append(jQuery('<li></li>').text(user));
-  });  
-
-  jQuery('#users').html(ol);
-});
-
-socket.on("disconnect", function() {
-  console.log("Disconnected from server");
-});
-
+//Add welcome message to new user
 socket.on('welcomeToChat', function(message){
   console.log('welcomeToChat', message);
 });
 
+//User sends a message
+socket.on('newMessage', function(message) {
+  var formatedTime = moment(message.createdAt).format('h:mm a');  
+  var template = jQuery('#message-template').html();
+  var html = Mustache.render(template,{
+    from: message.from,
+    text: message.text,
+    createdAt: formatedTime
+  });
+
+  jQuery('#messages').append(html);
+  scroolToBottom();
+});
+
+//User sends a location message
 socket.on('newLocationMessage', function(message){
   var formatedTime = moment(message.createdAt).format('h:mm a');
   var template = jQuery('#location-message-template').html();
@@ -61,19 +64,27 @@ socket.on('newLocationMessage', function(message){
   scroolToBottom();
 });
 
-socket.on('newMessage', function(message) {
-    var formatedTime = moment(message.createdAt).format('h:mm a');  
-    var template = jQuery('#message-template').html();
-    var html = Mustache.render(template,{
-      from: message.from,
-      text: message.text,
-      createdAt: formatedTime
-    });
+//Update user list
+socket.on('updateUserList', function(users) {
+  console.log(users);
+  var ol = jQuery('<ol></ol>');
+  users.forEach(function (user){
+    console.log(user);
+    ol.append(jQuery('<li></li>').text(user));
+  });  
 
-    jQuery('#messages').append(html);
-    scroolToBottom();
+  jQuery('#users').html(ol);
 });
 
+
+//Disconnect user
+socket.on("disconnect", function() {
+  console.log("Disconnected from server");
+});
+
+
+
+//On Submit new text (Chat page)
 jQuery('#message-form').on('submit', function(e) {
   e.preventDefault();
 
@@ -87,6 +98,7 @@ jQuery('#message-form').on('submit', function(e) {
 });
 
 
+//On Submit location (Chat page)
 var locationButton = jQuery('#send-location');
 locationButton.on('click', function () {
   if (!navigator.geolocation){
