@@ -30,7 +30,6 @@ socket.on("connect", function() {
 });
 
 socket.on('updateUserList', function(users) {
-  debugger;
   console.log(users);
   var ol = jQuery('<ol></ol>');
   users.forEach(function (user){
@@ -81,7 +80,6 @@ jQuery('#message-form').on('submit', function(e) {
   var messageTextBox = jQuery('[name=message]'); 
 
   socket.emit('createMessage', {
-    from: 'User',
     text: messageTextBox.val()
   }, function() {
     messageTextBox.val('');
@@ -96,7 +94,6 @@ locationButton.on('click', function () {
   }
 
   locationButton.attr('disabled', 'disabled').text('Sending location...');
-
   navigator.geolocation.getCurrentPosition(function(position) {
     locationButton.removeAttr('disabled').text('Send location');
     socket.emit('createLocationMessage', {
